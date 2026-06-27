@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#007bff">
+    <meta name="msapplication-TileColor" content="#007bff">
+    <meta name="msapplication-TileImage" content="./assets/favicon/favicon.png">
+    <title>圖片合成器</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" href="./assets/favicon/favicon.png">
+    <link rel="apple-touch-icon" href="./assets/favicon/favicon.png">
+    <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>圖片合成與裁切</h2>
+    <div class="layout">
+        <div class="left-panel">
+            <div class="control-card">
+                <h3 class="card-title">上層圖層</h3>
+                <div class="form-group">
+                    <label for="topUrl">上層圖片網址 (方框/浮水印)</label>
+                    <input type="url" id="topUrl" placeholder="請輸入上層圖片的 URL" autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="control-card">
+                <h3 class="card-title">下層圖層</h3>
+                <div class="form-group">
+                    <label>下層圖片 (底圖)</label>
+                    <div id="dropZone" class="drop-zone">
+                        <span id="dropZoneText">將圖片拖曳至此，或點擊選取檔案</span>
+                        <input type="file" id="bottomFile" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <label>
+                        <input type="radio" name="fitMode" value="autoShort" checked> 自動對齊短邊
+                    </label>
+                    <label>
+                        <input type="radio" name="fitMode" value="width"> 對齊寬度
+                    </label>
+                    <label>
+                        <input type="radio" name="fitMode" value="height"> 對齊高度
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <div class="scale-row">
+                        <label for="bottomScale">下層圖片縮放</label>
+                        <span id="bottomScaleValue" class="scale-value">100%</span>
+                    </div>
+                    <input type="range" id="bottomScale" min="10" max="300" step="1" value="100">
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <button id="downloadBtn" class="btn-download">下載合成圖片</button>
+            <p class="preview-header">預覽</p>
+            <canvas id="myCanvas" width="1000" height="1000"></canvas>
+            <div class="hint">💡 提示：可以直接在畫布上拖曳移動下層底圖的位置</div>
+        </div>
+    </div>
+</div>
+<div id="dropOverlay" class="drop-overlay" aria-hidden="true">
+    <div class="drop-overlay__content">放開即可上傳圖片</div>
+</div>
+<script type="module" src="./scripts/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "html-product-photo-frame-tool",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "podman compose up --build --exit-code-from test-runner",
+    "e2e": "podman compose up --build --exit-code-from test-runner"
+  }
+}

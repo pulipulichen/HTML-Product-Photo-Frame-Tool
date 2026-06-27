@@ -1,0 +1,12 @@
+FROM mcr.microsoft.com/playwright:v1.40.0-jammy
+
+WORKDIR /app
+
+RUN npm install -g http-server
+
+WORKDIR /deps
+RUN npm init -y && npm install @playwright/test@1.40.0
+
+WORKDIR /app
+
+CMD ["sh", "-c", "[ -e /app/node_modules ] || ln -s /deps/node_modules /app/node_modules; http-server . -p 8080 & sleep 2 && /deps/node_modules/.bin/playwright test --output=/app/playwright-report-videos"]
