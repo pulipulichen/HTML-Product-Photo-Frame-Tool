@@ -20,7 +20,7 @@ window.I18N_TRANSLATIONS.en = {
             title: "Top Layer",
             urlLabel: "Top image URL (frame/watermark)",
             urlPlaceholder: "Enter the top image URL",
-            quickFrame: "Apply \"YUANWU\" frame quickly"
+            quickFrame: "Apply \"Fated Finds\" frame quickly"
         },
         bottomLayer: {
             title: "Bottom Layer",
@@ -56,6 +56,9 @@ window.I18N_TRANSLATIONS.en = {
         replaceHint: "(Drag or click to replace)",
         photoParamInvalid: "Skipped: invalid photo URL parameter.",
         photoParamNotImage: "Skipped: photo URL parameter is not a loadable image.",
+        fatedFindsRequestFailed: "Skipped photo: fated_finds request failed.",
+        fatedFindsInvalidResponse: "Skipped photo: fated_finds returned invalid JSON.",
+        fatedFindsMissingPhotoUrl: "Skipped photo: fated_finds response has no photo_url.",
         frameParamInvalid: "Skipped: invalid frame URL parameter.",
         frameParamNotImage: "Skipped: frame URL parameter is not a loadable image.",
         saveBottomImageFailed: "Image is too large to save in browser storage, but editing and downloading still work.",

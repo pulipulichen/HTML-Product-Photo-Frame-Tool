@@ -26,6 +26,7 @@ const downloadButton = document.getElementById("downloadBtn");
 const quickFrameButton = document.getElementById("quickFrameBtn");
 const languageSelect = document.getElementById("languageSelect");
 const DEFAULT_FRAME_URL = "./assets/frame.png";
+const FATED_FINDS_PHOTO_RESOLVER_URL = "https://drive.google.com/uc?export=view&id=1PwWcwkDhLCnoSYdKrRcaRN8H1shEEplE";
 
 const app = {
     canvas,
@@ -241,15 +242,62 @@ function resolveImageParamToUrl(rawValue) {
     return new URL(rawValue, window.location.href).toString();
 }
 
+function shouldUseFatedFinds(params) {
+    return params.get("fated_finds")?.toLowerCase() === "true";
+}
+
+async function resolvePhotoUrlWithFatedFinds(rawPhotoParam) {
+    const resolverUrl = new URL(FATED_FINDS_PHOTO_RESOLVER_URL);
+    resolverUrl.searchParams.set("p", rawPhotoParam);
+
+    let response;
+    try {
+        response = await fetch(resolverUrl.toString());
+    } catch (error) {
+        console.log(t("messages.fatedFindsRequestFailed"));
+        return "";
+    }
+
+    if (!response.ok) {
+        console.log(t("messages.fatedFindsRequestFailed"));
+        return "";
+    }
+
+    let payload;
+    try {
+        payload = await response.json();
+    } catch (error) {
+        console.log(t("messages.fatedFindsInvalidResponse"));
+        return "";
+    }
+
+    const resolvedPhotoUrl = payload?.photo_url;
+    if (typeof resolvedPhotoUrl !== "string" || !resolvedPhotoUrl.trim()) {
+        console.log(t("messages.fatedFindsMissingPhotoUrl"));
+        return "";
+    }
+
+    return resolvedPhotoUrl.trim();
+}
+
 async function applyPhotoQueryParam(params) {
     const photoUrl = params.get("photo")?.trim();
     if (!photoUrl) {
         return;
     }
 
+    let sourcePhotoValue = photoUrl;
+    if (shouldUseFatedFinds(params)) {
+        const resolvedPhotoUrl = await resolvePhotoUrlWithFatedFinds(photoUrl);
+        if (!resolvedPhotoUrl) {
+            return;
+        }
+        sourcePhotoValue = resolvedPhotoUrl;
+    }
+
     let normalizedUrl;
     try {
-        normalizedUrl = resolveImageParamToUrl(photoUrl);
+        normalizedUrl = resolveImageParamToUrl(sourcePhotoValue);
     } catch (error) {
         console.log(t("messages.photoParamInvalid"));
         return;
