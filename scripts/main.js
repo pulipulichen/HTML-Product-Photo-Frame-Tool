@@ -7,12 +7,14 @@ import {
     saveFitMode,
     saveBottomScale
 } from "./services.js";
+import { initI18n, onLanguageChange, t } from "./modules/i18n.js";
 import { bindDropZoneEvents, bindCanvasDragEvents } from "./ui.js";
 import { getDownloadFilename, isImageFile, parseScale } from "./utils.js";
 
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 const topUrlInput = document.getElementById("topUrl");
+const bottomUrlInput = document.getElementById("bottomUrl");
 const dropZone = document.getElementById("dropZone");
 const dropZoneText = document.getElementById("dropZoneText");
 const dropOverlay = document.getElementById("dropOverlay");
@@ -22,12 +24,14 @@ const bottomScaleInput = document.getElementById("bottomScale");
 const bottomScaleValue = document.getElementById("bottomScaleValue");
 const downloadButton = document.getElementById("downloadBtn");
 const quickFrameButton = document.getElementById("quickFrameBtn");
+const languageSelect = document.getElementById("languageSelect");
 const DEFAULT_FRAME_URL = "./assets/frame.png";
 
 const app = {
     canvas,
     ctx,
     topUrlInput,
+    bottomUrlInput,
     dropZone,
     dropZoneText,
     dropOverlay,
@@ -52,6 +56,44 @@ const app = {
 app.topImg.crossOrigin = "Anonymous";
 app.bottomImg.crossOrigin = "Anonymous";
 
+const dropZoneState = {
+    type: "default",
+    fileName: ""
+};
+
+function escapeHtml(rawText) {
+    return String(rawText)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+function renderDropZoneText() {
+    if (dropZoneState.type === "file" && dropZoneState.fileName) {
+        app.dropZoneText.innerHTML = `${t("messages.fileLoaded")}<br><span class="file-name">${escapeHtml(dropZoneState.fileName)}</span>`;
+        return;
+    }
+
+    if (dropZoneState.type === "storage") {
+        app.dropZoneText.innerHTML = `${t("messages.loadedFromStorage")}<br><span class="file-name">${t("messages.replaceHint")}</span>`;
+        return;
+    }
+
+    if (dropZoneState.type === "query") {
+        app.dropZoneText.innerHTML = `${t("messages.loadedFromQuery")}<br><span class="file-name">${t("messages.replaceHint")}</span>`;
+        return;
+    }
+
+    if (dropZoneState.type === "url") {
+        app.dropZoneText.innerHTML = `${t("messages.loadedFromUrlInput")}<br><span class="file-name">${t("messages.replaceHint")}</span>`;
+        return;
+    }
+
+    app.dropZoneText.textContent = t("panels.bottomLayer.dropZoneDefault");
+}
+
 function canRegisterServiceWorker() {
     const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
     const isSecureContext = window.location.protocol === "https:" || isLocalhost;
@@ -65,7 +107,7 @@ function registerServiceWorker() {
 
     window.addEventListener("load", () => {
         navigator.serviceWorker.register("./service-worker.js").catch((error) => {
-            console.log("Service Worker 註冊失敗:", error);
+            console.log(t("messages.swRegisterFailed"), error);
         });
     });
 }
@@ -77,23 +119,23 @@ function updateScaleUI() {
 
 function processFile(file) {
     if (!isImageFile(file)) {
-        alert("請放入圖片檔案！");
+        alert(t("messages.invalidImageFile"));
         return;
     }
 
-    app.dropZoneText.innerHTML = `已載入圖片：<br><span class="file-name">${file.name}</span>`;
+    dropZoneState.type = "file";
+    dropZoneState.fileName = file.name;
+    renderDropZoneText();
 
     const reader = new FileReader();
     reader.onload = (event) => {
         const dataUrl = event.target.result;
-        app.bottomImg.src = dataUrl;
-        app.offsetX = 0;
-        app.offsetY = 0;
+        setBottomPhotoUrl(dataUrl, { persist: false, dropZoneType: "file" });
 
         try {
             saveBottomImageUrl(dataUrl);
         } catch (error) {
-            console.log("圖片體積較大，未成功儲存至瀏覽器紀錄，但仍可正常在畫面操作與下載。");
+            console.log(t("messages.saveBottomImageFailed"));
         }
     };
     reader.readAsDataURL(file);
@@ -110,6 +152,33 @@ function setTopFrameUrl(url) {
     app.draw();
 }
 
+function setBottomPhotoUrl(url, options = {}) {
+    const { persist = true, dropZoneType = "url" } = options;
+    const normalizedUrl = url.trim();
+    app.bottomUrlInput.value = normalizedUrl;
+
+    if (!normalizedUrl) {
+        if (persist) {
+            saveBottomImageUrl("");
+        }
+        dropZoneState.type = "default";
+        dropZoneState.fileName = "";
+        renderDropZoneText();
+        app.draw();
+        return;
+    }
+
+    app.bottomImg.src = normalizedUrl;
+    app.offsetX = 0;
+    app.offsetY = 0;
+    dropZoneState.type = dropZoneType;
+    dropZoneState.fileName = "";
+    renderDropZoneText();
+    if (persist) {
+        saveBottomImageUrl(normalizedUrl);
+    }
+}
+
 function downloadImage() {
     try {
         const dataUrl = app.canvas.toDataURL("image/png");
@@ -118,7 +187,7 @@ function downloadImage() {
         link.href = dataUrl;
         link.click();
     } catch (error) {
-        alert("無法下載圖片！可能是因為上層圖片網址不支援 CORS 跨域請求。");
+        alert(t("messages.downloadFailed"));
     }
 }
 
@@ -130,8 +199,11 @@ function applyStoredSettings() {
     }
 
     if (settings.bottomImageUrl) {
-        app.bottomImg.src = settings.bottomImageUrl;
-        app.dropZoneText.innerHTML = "已從瀏覽器紀錄載入上一次的圖片<br><span class='file-name'>（可重新拖曳或點擊更換）</span>";
+        setBottomPhotoUrl(settings.bottomImageUrl, { persist: false, dropZoneType: "storage" });
+    } else {
+        app.bottomUrlInput.value = "";
+        dropZoneState.type = "default";
+        dropZoneState.fileName = "";
     }
 
     if (settings.fitMode) {
@@ -152,6 +224,7 @@ function applyStoredSettings() {
         app.bottomScale = storedScale;
     }
     updateScaleUI();
+    renderDropZoneText();
 }
 
 function canLoadImageFromUrl(url) {
@@ -178,21 +251,17 @@ async function applyPhotoQueryParam(params) {
     try {
         normalizedUrl = resolveImageParamToUrl(photoUrl);
     } catch (error) {
-        console.log("網址參數 photo 格式不正確，已略過。");
+        console.log(t("messages.photoParamInvalid"));
         return;
     }
 
     const isImageUrl = await canLoadImageFromUrl(normalizedUrl);
     if (!isImageUrl) {
-        console.log("網址參數 photo 不是可載入的圖片，已略過。");
+        console.log(t("messages.photoParamNotImage"));
         return;
     }
 
-    app.bottomImg.src = normalizedUrl;
-    app.offsetX = 0;
-    app.offsetY = 0;
-    app.dropZoneText.innerHTML = "已從網址參數載入下層圖片<br><span class='file-name'>（可重新拖曳或點擊更換）</span>";
-    saveBottomImageUrl(normalizedUrl);
+    setBottomPhotoUrl(normalizedUrl, { dropZoneType: "query" });
 }
 
 async function applyFrameQueryParam(params) {
@@ -205,13 +274,13 @@ async function applyFrameQueryParam(params) {
     try {
         normalizedUrl = resolveImageParamToUrl(frameUrl);
     } catch (error) {
-        console.log("網址參數 frame 格式不正確，已略過。");
+        console.log(t("messages.frameParamInvalid"));
         return;
     }
 
     const isImageUrl = await canLoadImageFromUrl(normalizedUrl);
     if (!isImageUrl) {
-        console.log("網址參數 frame 不是可載入的圖片，已略過。");
+        console.log(t("messages.frameParamNotImage"));
         return;
     }
 
@@ -227,6 +296,9 @@ async function applyQueryImageParams() {
 function bindControlEvents() {
     app.topUrlInput.addEventListener("input", (event) => {
         setTopFrameUrl(event.target.value);
+    });
+    app.bottomUrlInput.addEventListener("input", (event) => {
+        setBottomPhotoUrl(event.target.value);
     });
 
     app.fitModeRadios.forEach((radio) => {
@@ -258,6 +330,11 @@ function bindControlEvents() {
 }
 
 async function init() {
+    initI18n(languageSelect);
+    onLanguageChange(() => {
+        updateScaleUI();
+        renderDropZoneText();
+    });
     applyStoredSettings();
     bindControlEvents();
     await applyQueryImageParams();

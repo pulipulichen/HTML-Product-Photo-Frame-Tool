@@ -15,45 +15,61 @@
 <body>
 
 <div class="container">
-    <h2>圖片合成與裁切</h2>
+    <div class="top-bar">
+        <h2 data-i18n="app.title">圖片合成與裁切</h2>
+        <div class="language-switcher">
+            <label for="languageSelect" data-i18n="language.label">語言</label>
+            <select id="languageSelect" data-i18n-aria-label="language.selectorAriaLabel" aria-label="Language selector">
+                <option value="zh-TW" data-i18n="language.options.zhTW">繁體中文</option>
+                <option value="en" data-i18n="language.options.en">English</option>
+            </select>
+        </div>
+    </div>
     <div class="layout">
         <div class="left-panel">
             <div class="control-card">
-                <h3 class="card-title">上層圖層</h3>
+                <h3 class="card-title" data-i18n="panels.topLayer.title">上層圖層</h3>
                 <div class="form-group">
-                    <label for="topUrl">上層圖片網址 (方框/浮水印)</label>
-                    <input type="url" id="topUrl" placeholder="請輸入上層圖片的 URL" autocomplete="off">
+                    <label for="topUrl" data-i18n="panels.topLayer.urlLabel">上層圖片網址 (方框/浮水印)</label>
+                    <input type="url" id="topUrl" data-i18n-placeholder="panels.topLayer.urlPlaceholder" placeholder="請輸入上層圖片的 URL" autocomplete="off">
                 </div>
                 <div class="quick-actions">
-                    <button type="button" id="quickFrameBtn" class="btn-quick-frame">快速套用「有緣物所」邊框</button>
+                    <button type="button" id="quickFrameBtn" class="btn-quick-frame" data-i18n="panels.topLayer.quickFrame">快速套用「有緣物所」邊框</button>
                 </div>
             </div>
             
             <div class="control-card">
-                <h3 class="card-title">下層圖層</h3>
+                <h3 class="card-title" data-i18n="panels.bottomLayer.title">下層圖層</h3>
                 <div class="form-group">
-                    <label>下層圖片 (底圖)</label>
+                    <label for="bottomUrl" data-i18n="panels.bottomLayer.urlLabel">下層圖片網址 (底圖)</label>
+                    <input type="url" id="bottomUrl" data-i18n-placeholder="panels.bottomLayer.urlPlaceholder" placeholder="請輸入下層圖片的 URL" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="panels.bottomLayer.imageLabel">下層圖片 (底圖)</label>
                     <div id="dropZone" class="drop-zone">
-                        <span id="dropZoneText">將圖片拖曳至此，或點擊選取檔案</span>
+                        <span id="dropZoneText" data-i18n="panels.bottomLayer.dropZoneDefault">將圖片拖曳至此，或點擊選取檔案</span>
                         <input type="file" id="bottomFile" accept="image/*" style="display: none;">
                     </div>
                 </div>
                 
                 <div class="controls">
                     <label>
-                        <input type="radio" name="fitMode" value="autoShort" checked> 自動對齊短邊
+                        <input type="radio" name="fitMode" value="autoShort" checked>
+                        <span data-i18n="fitMode.autoShort">自動對齊短邊</span>
                     </label>
                     <label>
-                        <input type="radio" name="fitMode" value="width"> 對齊寬度
+                        <input type="radio" name="fitMode" value="width">
+                        <span data-i18n="fitMode.width">對齊寬度</span>
                     </label>
                     <label>
-                        <input type="radio" name="fitMode" value="height"> 對齊高度
+                        <input type="radio" name="fitMode" value="height">
+                        <span data-i18n="fitMode.height">對齊高度</span>
                     </label>
                 </div>
 
                 <div class="form-group">
                     <div class="scale-row">
-                        <label for="bottomScale">下層圖片縮放</label>
+                        <label for="bottomScale" data-i18n="controls.bottomScale">下層圖片縮放</label>
                         <span id="bottomScaleValue" class="scale-value">100%</span>
                     </div>
                     <input type="range" id="bottomScale" min="10" max="300" step="1" value="100">
@@ -61,16 +77,18 @@
             </div>
         </div>
         <div class="right-panel">
-            <button id="downloadBtn" class="btn-download">下載合成圖片</button>
-            <p class="preview-header">預覽</p>
+            <button id="downloadBtn" class="btn-download" data-i18n="preview.download">下載合成圖片</button>
+            <p class="preview-header" data-i18n="preview.header">預覽</p>
             <canvas id="myCanvas" width="1000" height="1000"></canvas>
-            <div class="hint">💡 提示：可以直接在畫布上拖曳移動下層底圖的位置</div>
+            <div class="hint" data-i18n="preview.hint">💡 提示：可以直接在畫布上拖曳移動下層底圖的位置</div>
         </div>
     </div>
 </div>
 <div id="dropOverlay" class="drop-overlay" aria-hidden="true">
-    <div class="drop-overlay__content">放開即可上傳圖片</div>
+    <div class="drop-overlay__content" data-i18n="overlay.dropToUpload">放開即可上傳圖片</div>
 </div>
+<script src="./scripts/modules/i18n/zh-TW.js"></script>
+<script src="./scripts/modules/i18n/en.js"></script>
 <script type="module" src="./scripts/main.js"></script>
 
 </body>

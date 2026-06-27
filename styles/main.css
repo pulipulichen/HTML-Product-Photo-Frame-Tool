@@ -27,6 +27,41 @@ h2 {
     text-align: center;
 }
 
+.top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.top-bar h2 {
+    margin: 0;
+    text-align: left;
+}
+
+.language-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.language-switcher label {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.language-switcher select {
+    border: 1px solid #cfd6e4;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #333;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+}
+
 .layout {
     display: block;
 }
@@ -244,7 +279,7 @@ canvas:active {
         flex-direction: column;
     }
 
-    h2 {
+    .top-bar {
         margin-bottom: 12px;
     }
 
@@ -286,5 +321,9 @@ canvas:active {
 @media (max-width: 900px) {
     body {
         overflow-y: auto;
+    }
+
+    .top-bar h2 {
+        width: 100%;
     }
 }
