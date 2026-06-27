@@ -4,11 +4,11 @@ All notable changes to this project are documented in versioned files under `cha
 
 ## Latest Version
 
-- [0.0.1](./changelog/CHANGELOG-0.0.1.md)
+- [0.0.2](./changelog/CHANGELOG-0.0.2.md)
 
 ## Archive
 
-- None yet.
+- [0.0.1](./changelog/CHANGELOG-0.0.1.md)
 
 ## Update Policy
 

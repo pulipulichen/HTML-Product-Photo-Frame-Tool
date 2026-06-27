@@ -44,7 +44,8 @@ window.I18N_TRANSLATIONS["zh-TW"] = {
         hint: "💡 提示：可以直接在畫布上拖曳移動下層底圖的位置"
     },
     overlay: {
-        dropToUpload: "放開即可上傳圖片"
+        dropToUpload: "放開即可上傳圖片",
+        loading: "讀取中..."
     },
     messages: {
         invalidImageFile: "請放入圖片檔案！",

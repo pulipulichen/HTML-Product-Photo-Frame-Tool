@@ -11,12 +11,29 @@ A browser-based tool for composing product photos by placing a background image 
 ## Features
 
 - Overlay workflow: set a top-layer image by URL (frame/watermark) and upload a bottom-layer image by drag-and-drop or file picker.
+- Bottom image URL input: paste an image URL directly as the base photo source.
 - Canvas controls: drag directly on the canvas to move the bottom image.
 - Fit modes: `autoShort`, `width`, and `height`.
 - Bottom image scale slider: adjustable from 10% to 300%.
+- Built-in quick frame button: apply the bundled `assets/frame.png` frame in one click.
 - PNG export: download merged image with a timestamped filename.
 - Session persistence: top URL, bottom image (Data URL), fit mode, and scale are stored in `localStorage`.
+- Query-parameter image loading: preload frame/photo via `?frame=<url>&photo=<url>`.
+- Fated Finds resolver support: with `?fated_finds=true`, `photo` is resolved through a remote resolver and injected as Data URL.
+- Bilingual UI: runtime language switch between Traditional Chinese and English.
 - PWA-ready shell: includes `manifest.json` and a service worker for app shell caching.
+
+## URL Parameters
+
+- `frame`: prefill top-layer frame image URL.
+- `photo`: prefill bottom-layer image URL.
+- `fated_finds=true`: treat `photo` as a Fated Finds identifier and resolve image data via remote API.
+
+Example:
+
+```text
+https://pulipulichen.github.io/HTML-Product-Photo-Frame-Tool/?frame=https://example.com/frame.png&photo=https://example.com/photo.jpg
+```
 
 ## Project Structure
 

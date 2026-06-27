@@ -44,7 +44,8 @@ window.I18N_TRANSLATIONS.en = {
         hint: "💡 Tip: Drag directly on the canvas to move the bottom image"
     },
     overlay: {
-        dropToUpload: "Release to upload image"
+        dropToUpload: "Release to upload image",
+        loading: "Loading..."
     },
     messages: {
         invalidImageFile: "Please upload an image file.",

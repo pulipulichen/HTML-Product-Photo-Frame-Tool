@@ -11,12 +11,29 @@
 ## 功能特色
 
 - 上下層合成流程：上層圖片以 URL 指定（框圖/浮水印），下層圖片可拖放或點擊選取上傳。
+- 下層圖片 URL 輸入：可直接貼上圖片網址作為底圖來源。
 - 畫布操作：可直接在畫布上拖曳移動下層底圖位置。
 - 對齊模式：`autoShort`、`width`、`height`。
 - 下層縮放滑桿：可調整 10% 到 300%。
+- 內建快速框圖：一鍵套用 `assets/frame.png` 預設邊框。
 - PNG 下載：可輸出合成結果，檔名帶有時間戳記。
 - 設定持久化：上層 URL、下層圖片（Data URL）、對齊模式、縮放比例會寫入 `localStorage`。
+- URL 參數載入：可透過 `?frame=<url>&photo=<url>` 預先帶入框圖與底圖。
+- Fated Finds 解析支援：搭配 `?fated_finds=true` 時，會先透過遠端 API 解析 `photo` 再載入。
+- 雙語介面：可在繁體中文與 English 之間即時切換。
 - PWA 基礎支援：包含 `manifest.json` 與 service worker，提供 app shell 快取能力。
+
+## URL 參數
+
+- `frame`：預先帶入上層框圖 URL。
+- `photo`：預先帶入下層底圖 URL。
+- `fated_finds=true`：將 `photo` 視為 Fated Finds 參數，先透過遠端 API 解析為圖片資料後載入。
+
+範例：
+
+```text
+https://pulipulichen.github.io/HTML-Product-Photo-Frame-Tool/?frame=https://example.com/frame.png&photo=https://example.com/photo.jpg
+```
 
 ## 專案結構
 

@@ -18,6 +18,7 @@ const bottomUrlInput = document.getElementById("bottomUrl");
 const dropZone = document.getElementById("dropZone");
 const dropZoneText = document.getElementById("dropZoneText");
 const dropOverlay = document.getElementById("dropOverlay");
+const loadingOverlay = document.getElementById("loadingOverlay");
 const bottomFileInput = document.getElementById("bottomFile");
 const fitModeRadios = document.querySelectorAll('input[name="fitMode"]');
 const bottomScaleInput = document.getElementById("bottomScale");
@@ -111,6 +112,14 @@ function registerServiceWorker() {
             console.log(t("messages.swRegisterFailed"), error);
         });
     });
+}
+
+function setLoadingOverlayVisible(isVisible) {
+    if (!loadingOverlay) {
+        return;
+    }
+    loadingOverlay.classList.toggle("visible", isVisible);
+    loadingOverlay.setAttribute("aria-hidden", isVisible ? "false" : "true");
 }
 
 function updateScaleUI() {
@@ -251,11 +260,14 @@ async function resolvePhotoUrlWithFatedFinds(rawPhotoParam) {
     resolverUrl.searchParams.set("p", rawPhotoParam);
 
     let response;
+    setLoadingOverlayVisible(true);
     try {
         response = await fetch(resolverUrl.toString());
     } catch (error) {
         console.log(t("messages.fatedFindsRequestFailed"));
         return "";
+    } finally {
+        setLoadingOverlayVisible(false);
     }
 
     if (!response.ok) {
