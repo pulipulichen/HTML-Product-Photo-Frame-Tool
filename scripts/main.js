@@ -21,6 +21,8 @@ const fitModeRadios = document.querySelectorAll('input[name="fitMode"]');
 const bottomScaleInput = document.getElementById("bottomScale");
 const bottomScaleValue = document.getElementById("bottomScaleValue");
 const downloadButton = document.getElementById("downloadBtn");
+const quickFrameButton = document.getElementById("quickFrameBtn");
+const DEFAULT_FRAME_URL = "./assets/frame.png";
 
 const app = {
     canvas,
@@ -97,6 +99,17 @@ function processFile(file) {
     reader.readAsDataURL(file);
 }
 
+function setTopFrameUrl(url) {
+    const normalizedUrl = url.trim();
+    app.topUrlInput.value = normalizedUrl;
+    saveTopImageUrl(normalizedUrl);
+    if (normalizedUrl) {
+        app.topImg.src = normalizedUrl;
+        return;
+    }
+    app.draw();
+}
+
 function downloadImage() {
     try {
         const dataUrl = app.canvas.toDataURL("image/png");
@@ -113,8 +126,7 @@ function applyStoredSettings() {
     const settings = loadSettings();
 
     if (settings.topImageUrl) {
-        app.topUrlInput.value = settings.topImageUrl;
-        app.topImg.src = settings.topImageUrl;
+        setTopFrameUrl(settings.topImageUrl);
     }
 
     if (settings.bottomImageUrl) {
@@ -152,8 +164,11 @@ function canLoadImageFromUrl(url) {
     });
 }
 
-async function applyPhotoQueryParam() {
-    const params = new URLSearchParams(window.location.search);
+function resolveImageParamToUrl(rawValue) {
+    return new URL(rawValue, window.location.href).toString();
+}
+
+async function applyPhotoQueryParam(params) {
     const photoUrl = params.get("photo")?.trim();
     if (!photoUrl) {
         return;
@@ -161,7 +176,7 @@ async function applyPhotoQueryParam() {
 
     let normalizedUrl;
     try {
-        normalizedUrl = new URL(photoUrl).toString();
+        normalizedUrl = resolveImageParamToUrl(photoUrl);
     } catch (error) {
         console.log("網址參數 photo 格式不正確，已略過。");
         return;
@@ -180,15 +195,38 @@ async function applyPhotoQueryParam() {
     saveBottomImageUrl(normalizedUrl);
 }
 
+async function applyFrameQueryParam(params) {
+    const frameUrl = params.get("frame")?.trim();
+    if (!frameUrl) {
+        return;
+    }
+
+    let normalizedUrl;
+    try {
+        normalizedUrl = resolveImageParamToUrl(frameUrl);
+    } catch (error) {
+        console.log("網址參數 frame 格式不正確，已略過。");
+        return;
+    }
+
+    const isImageUrl = await canLoadImageFromUrl(normalizedUrl);
+    if (!isImageUrl) {
+        console.log("網址參數 frame 不是可載入的圖片，已略過。");
+        return;
+    }
+
+    setTopFrameUrl(normalizedUrl);
+}
+
+async function applyQueryImageParams() {
+    const params = new URLSearchParams(window.location.search);
+    await applyFrameQueryParam(params);
+    await applyPhotoQueryParam(params);
+}
+
 function bindControlEvents() {
     app.topUrlInput.addEventListener("input", (event) => {
-        const url = event.target.value;
-        saveTopImageUrl(url);
-        if (url) {
-            app.topImg.src = url;
-            return;
-        }
-        app.draw();
+        setTopFrameUrl(event.target.value);
     });
 
     app.fitModeRadios.forEach((radio) => {
@@ -211,13 +249,18 @@ function bindControlEvents() {
 
     app.topImg.onload = () => app.draw();
     app.bottomImg.onload = () => app.draw();
+    if (quickFrameButton) {
+        quickFrameButton.addEventListener("click", () => {
+            setTopFrameUrl(DEFAULT_FRAME_URL);
+        });
+    }
     downloadButton.addEventListener("click", downloadImage);
 }
 
 async function init() {
     applyStoredSettings();
     bindControlEvents();
-    await applyPhotoQueryParam();
+    await applyQueryImageParams();
     bindDropZoneEvents({ ...app, processFile });
     bindCanvasDragEvents(app);
     app.draw();
