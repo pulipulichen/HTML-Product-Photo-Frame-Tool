@@ -26,7 +26,7 @@ const downloadButton = document.getElementById("downloadBtn");
 const quickFrameButton = document.getElementById("quickFrameBtn");
 const languageSelect = document.getElementById("languageSelect");
 const DEFAULT_FRAME_URL = "./assets/frame.png";
-const FATED_FINDS_PHOTO_RESOLVER_URL = "https://drive.google.com/uc?export=view&id=1PwWcwkDhLCnoSYdKrRcaRN8H1shEEplE";
+const FATED_FINDS_PHOTO_RESOLVER_URL = "https://script.google.com/macros/s/AKfycbwARlId6wP2jgHxMpV93KCEf2u2BjcTBa_UdXhqajv8GJNWO39mfgL2QkJ2VZKU1cmOxg/exec";
 
 const app = {
     canvas,
@@ -271,13 +271,18 @@ async function resolvePhotoUrlWithFatedFinds(rawPhotoParam) {
         return "";
     }
 
-    const resolvedPhotoUrl = payload?.photo_url;
-    if (typeof resolvedPhotoUrl !== "string" || !resolvedPhotoUrl.trim()) {
-        console.log(t("messages.fatedFindsMissingPhotoUrl"));
+    const photoBase64 = payload?.photo_base64;
+    if (typeof photoBase64 !== "string" || !photoBase64.trim()) {
+        console.log(t("messages.fatedFindsMissingPhotoBase64"));
         return "";
     }
 
-    return resolvedPhotoUrl.trim();
+    const trimmedPhotoBase64 = photoBase64.trim();
+    if (trimmedPhotoBase64.startsWith("data:image/")) {
+        return trimmedPhotoBase64;
+    }
+
+    return `data:image/png;base64,${trimmedPhotoBase64}`;
 }
 
 async function applyPhotoQueryParam(params) {
@@ -297,7 +302,11 @@ async function applyPhotoQueryParam(params) {
 
     let normalizedUrl;
     try {
-        normalizedUrl = resolveImageParamToUrl(sourcePhotoValue);
+        if (sourcePhotoValue.startsWith("data:image/")) {
+            normalizedUrl = sourcePhotoValue;
+        } else {
+            normalizedUrl = resolveImageParamToUrl(sourcePhotoValue);
+        }
     } catch (error) {
         console.log(t("messages.photoParamInvalid"));
         return;

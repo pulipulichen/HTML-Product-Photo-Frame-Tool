@@ -58,7 +58,7 @@ window.I18N_TRANSLATIONS.en = {
         photoParamNotImage: "Skipped: photo URL parameter is not a loadable image.",
         fatedFindsRequestFailed: "Skipped photo: fated_finds request failed.",
         fatedFindsInvalidResponse: "Skipped photo: fated_finds returned invalid JSON.",
-        fatedFindsMissingPhotoUrl: "Skipped photo: fated_finds response has no photo_url.",
+        fatedFindsMissingPhotoBase64: "Skipped photo: fated_finds response has no photo_base64.",
         frameParamInvalid: "Skipped: invalid frame URL parameter.",
         frameParamNotImage: "Skipped: frame URL parameter is not a loadable image.",
         saveBottomImageFailed: "Image is too large to save in browser storage, but editing and downloading still work.",
