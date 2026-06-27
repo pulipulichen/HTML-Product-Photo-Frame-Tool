@@ -1,17 +1,61 @@
-# HTML-Product-Photo-Frame-Tool
-A local web tool for creating framed product photos with drag-and-drop image placement and PNG export.
+# HTML Product Photo Frame Tool
 
-# Demo
+[English](./README.md) | [繁體中文](./README_zh_tw.md)
 
-https://pulipulichen.github.io/HTML-Product-Photo-Frame-Tool/
+A browser-based tool for composing product photos by placing a background image under a frame/watermark overlay, then exporting the merged result as PNG.
 
-## E2E testing
+## Demo
 
-- E2E tests are implemented with Playwright in `e2e/`.
-- Run tests with Podman Compose:
+- [Live Demo](https://pulipulichen.github.io/HTML-Product-Photo-Frame-Tool/)
+
+## Features
+
+- Overlay workflow: set a top-layer image by URL (frame/watermark) and upload a bottom-layer image by drag-and-drop or file picker.
+- Canvas controls: drag directly on the canvas to move the bottom image.
+- Fit modes: `autoShort`, `width`, and `height`.
+- Bottom image scale slider: adjustable from 10% to 300%.
+- PNG export: download merged image with a timestamped filename.
+- Session persistence: top URL, bottom image (Data URL), fit mode, and scale are stored in `localStorage`.
+- PWA-ready shell: includes `manifest.json` and a service worker for app shell caching.
+
+## Project Structure
+
+- `index.html`: UI layout and app entry.
+- `scripts/main.js`: app bootstrap, events, state wiring, service worker registration.
+- `scripts/core.js`: canvas rendering logic.
+- `scripts/ui.js`: drag-drop upload and pointer drag behavior.
+- `scripts/services.js`: `localStorage` persistence helpers.
+- `scripts/utils.js`: utility functions (filename, validation, scale parsing).
+- `service-worker.js`: app shell cache strategy.
+- `e2e/`: Playwright end-to-end test cases.
+
+## Run Locally
+
+This is a static frontend project. You can serve it with any static server.
+
+Example:
+
+```bash
+python -m http.server 8080
+```
+
+Then open `http://localhost:8080`.
+
+## E2E Testing (Podman Compose)
+
+Playwright tests run inside a Podman Compose workflow defined by `compose.yml` and `Containerfile.test`.
 
 ```bash
 npm run start
 ```
 
-- Test artifacts are generated in `playwright-report/` and `playwright-report-videos/`.
+or
+
+```bash
+npm run e2e
+```
+
+Test artifacts are generated in:
+
+- `playwright-report/`
+- `playwright-report-videos/`

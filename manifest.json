@@ -1,6 +1,6 @@
 {
-  "name": "圖片合成器",
-  "short_name": "圖片合成器",
+  "name": "prod. frame 商品加框器",
+  "short_name": "商品加框器",
   "description": "本機圖片合成工具，可拖放底圖、套用上層框圖並輸出 PNG。",
   "start_url": "./",
   "scope": "./",
