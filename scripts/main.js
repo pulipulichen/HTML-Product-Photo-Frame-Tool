@@ -201,6 +201,18 @@ function downloadImage() {
     }
 }
 
+function shouldHandleDownloadShortcut(target) {
+    if (!(target instanceof HTMLElement)) {
+        return true;
+    }
+
+    if (target.isContentEditable) {
+        return false;
+    }
+
+    return !["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
+}
+
 function applyStoredSettings() {
     const settings = loadSettings();
 
@@ -396,6 +408,22 @@ function bindControlEvents() {
         });
     }
     downloadButton.addEventListener("click", downloadImage);
+    document.addEventListener("keydown", (event) => {
+        if (event.defaultPrevented || event.repeat) {
+            return;
+        }
+
+        if (event.key.toLowerCase() !== "s") {
+            return;
+        }
+
+        if (!shouldHandleDownloadShortcut(event.target)) {
+            return;
+        }
+
+        event.preventDefault();
+        downloadImage();
+    });
 }
 
 async function init() {
