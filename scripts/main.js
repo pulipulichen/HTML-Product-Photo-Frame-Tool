@@ -142,6 +142,44 @@ function applyStoredSettings() {
     updateScaleUI();
 }
 
+function canLoadImageFromUrl(url) {
+    return new Promise((resolve) => {
+        const testImage = new Image();
+        testImage.crossOrigin = "Anonymous";
+        testImage.onload = () => resolve(true);
+        testImage.onerror = () => resolve(false);
+        testImage.src = url;
+    });
+}
+
+async function applyPhotoQueryParam() {
+    const params = new URLSearchParams(window.location.search);
+    const photoUrl = params.get("photo")?.trim();
+    if (!photoUrl) {
+        return;
+    }
+
+    let normalizedUrl;
+    try {
+        normalizedUrl = new URL(photoUrl).toString();
+    } catch (error) {
+        console.log("網址參數 photo 格式不正確，已略過。");
+        return;
+    }
+
+    const isImageUrl = await canLoadImageFromUrl(normalizedUrl);
+    if (!isImageUrl) {
+        console.log("網址參數 photo 不是可載入的圖片，已略過。");
+        return;
+    }
+
+    app.bottomImg.src = normalizedUrl;
+    app.offsetX = 0;
+    app.offsetY = 0;
+    app.dropZoneText.innerHTML = "已從網址參數載入下層圖片<br><span class='file-name'>（可重新拖曳或點擊更換）</span>";
+    saveBottomImageUrl(normalizedUrl);
+}
+
 function bindControlEvents() {
     app.topUrlInput.addEventListener("input", (event) => {
         const url = event.target.value;
@@ -176,9 +214,10 @@ function bindControlEvents() {
     downloadButton.addEventListener("click", downloadImage);
 }
 
-function init() {
+async function init() {
     applyStoredSettings();
     bindControlEvents();
+    await applyPhotoQueryParam();
     bindDropZoneEvents({ ...app, processFile });
     bindCanvasDragEvents(app);
     app.draw();
