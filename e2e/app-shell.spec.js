@@ -12,6 +12,7 @@ test('renders app shell and default controls', async ({ page }) => {
   await expect(page.locator('input[name="fitMode"][value="autoShort"]')).toBeChecked();
   await expect(page.locator('#bottomScale')).toHaveValue('100');
   await expect(page.locator('#bottomScaleValue')).toHaveText('100%');
+  await expect(page.locator('#resetScaleBtn')).toBeVisible();
 });
 
 test('persists top image url in local storage', async ({ page }) => {

@@ -36,7 +36,8 @@ window.I18N_TRANSLATIONS.en = {
         height: "Fit height"
     },
     controls: {
-        bottomScale: "Bottom image scale"
+        bottomScale: "Bottom image scale",
+        resetScaleAndCenter: "Reset scale and center"
     },
     preview: {
         download: "Download composited image",

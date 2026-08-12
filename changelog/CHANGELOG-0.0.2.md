@@ -9,6 +9,7 @@
 - Added URL parameter support for preloading images via `frame` and `photo`.
 - Added `fated_finds=true` flow to resolve `photo` values through the remote resolver endpoint.
 - Added a quick action button to apply the bundled default frame (`assets/frame.png`).
+- Added a reset scale and center control for the bottom image; loading a new bottom image also resets scale to 100% and centers the image.
 
 ### Changed
 

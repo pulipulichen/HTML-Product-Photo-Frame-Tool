@@ -278,7 +278,8 @@ canvas:active {
     background-color: #0056b3;
 }
 
-.btn-quick-frame {
+.btn-quick-frame,
+.btn-secondary {
     width: 100%;
     border: 1px solid #007bff;
     border-radius: 6px;
@@ -291,7 +292,8 @@ canvas:active {
     transition: background-color 0.2s, color 0.2s;
 }
 
-.btn-quick-frame:hover {
+.btn-quick-frame:hover,
+.btn-secondary:hover {
     background-color: #007bff;
     color: #ffffff;
 }

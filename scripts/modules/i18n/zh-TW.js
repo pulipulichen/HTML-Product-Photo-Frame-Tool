@@ -36,7 +36,8 @@ window.I18N_TRANSLATIONS["zh-TW"] = {
         height: "對齊高度"
     },
     controls: {
-        bottomScale: "下層圖片縮放"
+        bottomScale: "下層圖片縮放",
+        resetScaleAndCenter: "重設縮放並置中"
     },
     preview: {
         download: "下載合成圖片",

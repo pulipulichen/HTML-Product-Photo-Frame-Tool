@@ -1,5 +1,5 @@
 /* global alert, console */
-import { drawCanvas } from "./core.js";
+import { centerBottomImage, drawCanvas } from "./core.js";
 import {
     loadSettings,
     saveTopImageUrl,
@@ -25,6 +25,7 @@ const bottomScaleInput = document.getElementById("bottomScale");
 const bottomScaleValue = document.getElementById("bottomScaleValue");
 const downloadButton = document.getElementById("downloadBtn");
 const quickFrameButton = document.getElementById("quickFrameBtn");
+const resetScaleButton = document.getElementById("resetScaleBtn");
 const languageSelect = document.getElementById("languageSelect");
 const DEFAULT_FRAME_URL = "./assets/frame.png";
 const FATED_FINDS_PHOTO_RESOLVER_URL = "https://script.google.com/macros/s/AKfycbwARlId6wP2jgHxMpV93KCEf2u2BjcTBa_UdXhqajv8GJNWO39mfgL2QkJ2VZKU1cmOxg/exec";
@@ -47,6 +48,8 @@ const app = {
     offsetX: 0,
     offsetY: 0,
     bottomScale: 1,
+    shouldResetTransformOnLoad: false,
+    bottomLoadGeneration: 0,
     isDragging: false,
     startX: 0,
     startY: 0,
@@ -127,6 +130,24 @@ function updateScaleUI() {
     app.bottomScaleInput.value = String(Math.round(app.bottomScale * 100));
 }
 
+function resetScaleAndCenter() {
+    app.bottomScale = 1;
+    updateScaleUI();
+    saveBottomScale(app.bottomScale);
+    centerBottomImage(app);
+    app.draw();
+}
+
+function applyResetTransformOnLoad() {
+    if (!app.shouldResetTransformOnLoad) {
+        app.draw();
+        return;
+    }
+
+    app.shouldResetTransformOnLoad = false;
+    resetScaleAndCenter();
+}
+
 function processFile(file) {
     if (!isImageFile(file)) {
         alert(t("messages.invalidImageFile"));
@@ -163,7 +184,7 @@ function setTopFrameUrl(url) {
 }
 
 function setBottomPhotoUrl(url, options = {}) {
-    const { persist = true, dropZoneType = "url" } = options;
+    const { persist = true, dropZoneType = "url", resetTransform = true } = options;
     const normalizedUrl = url.trim();
     app.bottomUrlInput.value = normalizedUrl;
 
@@ -171,6 +192,7 @@ function setBottomPhotoUrl(url, options = {}) {
         if (persist) {
             saveBottomImageUrl("");
         }
+        app.shouldResetTransformOnLoad = false;
         dropZoneState.type = "default";
         dropZoneState.fileName = "";
         renderDropZoneText();
@@ -178,15 +200,30 @@ function setBottomPhotoUrl(url, options = {}) {
         return;
     }
 
+    app.shouldResetTransformOnLoad = resetTransform;
+    const loadGeneration = ++app.bottomLoadGeneration;
     app.bottomImg.src = normalizedUrl;
-    app.offsetX = 0;
-    app.offsetY = 0;
+    if (!resetTransform) {
+        app.offsetX = 0;
+        app.offsetY = 0;
+    }
     dropZoneState.type = dropZoneType;
     dropZoneState.fileName = "";
     renderDropZoneText();
     if (persist) {
         saveBottomImageUrl(normalizedUrl);
     }
+
+    app.bottomImg.decode()
+        .then(() => {
+            if (loadGeneration !== app.bottomLoadGeneration) {
+                return;
+            }
+            applyResetTransformOnLoad();
+        })
+        .catch(() => {
+            // Ignore invalid or intermediate URLs while typing.
+        });
 }
 
 function downloadImage() {
@@ -221,7 +258,11 @@ function applyStoredSettings() {
     }
 
     if (settings.bottomImageUrl) {
-        setBottomPhotoUrl(settings.bottomImageUrl, { persist: false, dropZoneType: "storage" });
+        setBottomPhotoUrl(settings.bottomImageUrl, {
+            persist: false,
+            dropZoneType: "storage",
+            resetTransform: false
+        });
     } else {
         app.bottomUrlInput.value = "";
         dropZoneState.type = "default";
@@ -405,6 +446,11 @@ function bindControlEvents() {
     if (quickFrameButton) {
         quickFrameButton.addEventListener("click", () => {
             setTopFrameUrl(DEFAULT_FRAME_URL);
+        });
+    }
+    if (resetScaleButton) {
+        resetScaleButton.addEventListener("click", () => {
+            resetScaleAndCenter();
         });
     }
     downloadButton.addEventListener("click", downloadImage);

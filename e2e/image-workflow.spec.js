@@ -57,3 +57,27 @@ test('updates scale and fit mode, then keeps settings after reload', async ({ pa
   expect(persistedFitMode).toBe('height');
   expect(persistedBottomScale).toBe('1.5');
 });
+
+test('resets scale when clicking reset or loading a new bottom image', async ({ page }) => {
+  await page.goto('/');
+
+  await page.locator('#bottomScale').fill('180');
+  await expect(page.locator('#bottomScaleValue')).toHaveText('180%');
+
+  await page.locator('#resetScaleBtn').click();
+  await expect(page.locator('#bottomScale')).toHaveValue('100');
+  await expect(page.locator('#bottomScaleValue')).toHaveText('100%');
+
+  await page.locator('#bottomScale').fill('160');
+  await expect(page.locator('#bottomScaleValue')).toHaveText('160%');
+
+  await page.locator('#bottomFile').setInputFiles({
+    name: 'reset-scale.png',
+    mimeType: 'image/png',
+    buffer: createPngBuffer()
+  });
+
+  await expect(page.locator('#dropZoneText')).toContainText('已載入圖片');
+  await expect(page.locator('#bottomScale')).toHaveValue('100');
+  await expect(page.locator('#bottomScaleValue')).toHaveText('100%');
+});
